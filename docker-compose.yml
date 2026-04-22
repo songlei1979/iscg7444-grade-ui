@@ -1,0 +1,41 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Unitec123
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+    ports:
+      - "8080:80"
+
+  flask:
+    build:
+      context: ./ISCG7444-relationalDB
+    depends_on:
+      - mysql
+    ports:
+      - "5001:5001"
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: Unitec123
+
+  react:
+    build:
+      context: ./iscg7444-grade-ui
+    depends_on:
+      - flask
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:5001
+
+volumes:
+  mysql_data:
